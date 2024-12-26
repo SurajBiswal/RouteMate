@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.locationtech.jts.geom.Point;
 
-import java.awt.*;
-
 @Entity
 @Getter
 @Setter
@@ -19,7 +17,8 @@ public class Driver {
     private User user;
     private Double rating;
     private Boolean available;
-
+    private String vehicleId;
     @Column(columnDefinition = "Geometry(Point, 4326)")
-    Point currentLocation;
+    private Point currentLocation;
+
 }

@@ -1,16 +1,24 @@
 package com.suraj.cabService.RouteMate.strategies.impl;
 
-import com.suraj.cabService.RouteMate.dto.RideRequestDto;
 import com.suraj.cabService.RouteMate.entities.Driver;
+import com.suraj.cabService.RouteMate.entities.RideRequest;
+import com.suraj.cabService.RouteMate.repositories.DriverRepository;
 import com.suraj.cabService.RouteMate.strategies.DriverMatchingStrategy;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+@Transactional()
 public class DriverMatchingHighestRatedDriverStrategy implements DriverMatchingStrategy {
+
+    private final DriverRepository driverRepository;
+
     @Override
-    public List<Driver> findMatchingDriver(RideRequestDto rideRequestDto) {
-        return List.of();
+    public List<Driver> findMatchingDriver(RideRequest rideRequest) {
+        return driverRepository.findTenNearbyTopRatedDrivers(rideRequest.getPickupLocation());
     }
 }

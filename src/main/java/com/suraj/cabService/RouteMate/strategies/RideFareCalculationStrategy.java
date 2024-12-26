@@ -1,7 +1,9 @@
 package com.suraj.cabService.RouteMate.strategies;
 
-import com.suraj.cabService.RouteMate.dto.RideRequestDto;
+import com.suraj.cabService.RouteMate.entities.RideRequest;
 
 public interface RideFareCalculationStrategy {
-    double calculateFare(RideRequestDto rideRequestDto);
+
+    double RIDE_FARE_MULTIPLIER = 10;
+    double calculateFare(RideRequest rideRequest);
 }

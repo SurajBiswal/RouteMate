@@ -3,16 +3,21 @@ package com.suraj.cabService.RouteMate.entities;
 import com.suraj.cabService.RouteMate.entities.enums.PaymentMethod;
 import com.suraj.cabService.RouteMate.entities.enums.RideStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.awt.*;
+//import java.awt.*;
+import org.locationtech.jts.geom.Point;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Ride {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +35,7 @@ public class Ride {
     private Rider rider;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Rider driver;
+    private Driver driver;
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
