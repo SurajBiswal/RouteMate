@@ -9,5 +9,4 @@ public class RouteMateApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(RouteMateApplication.class, args);
 	}
-
 }

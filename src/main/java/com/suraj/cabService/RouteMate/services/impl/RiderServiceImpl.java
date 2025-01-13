@@ -4,23 +4,27 @@ import com.suraj.cabService.RouteMate.dto.DriverDto;
 import com.suraj.cabService.RouteMate.dto.RideDto;
 import com.suraj.cabService.RouteMate.dto.RideRequestDto;
 import com.suraj.cabService.RouteMate.dto.RiderDto;
-import com.suraj.cabService.RouteMate.entities.Driver;
-import com.suraj.cabService.RouteMate.entities.RideRequest;
-import com.suraj.cabService.RouteMate.entities.Rider;
-import com.suraj.cabService.RouteMate.entities.User;
+import com.suraj.cabService.RouteMate.entities.*;
 import com.suraj.cabService.RouteMate.entities.enums.RideRequestStatus;
+import com.suraj.cabService.RouteMate.entities.enums.RideStatus;
 import com.suraj.cabService.RouteMate.exceptions.ResourceNotFoundException;
 import com.suraj.cabService.RouteMate.repositories.RideRequestRepository;
 import com.suraj.cabService.RouteMate.repositories.RiderRepository;
+import com.suraj.cabService.RouteMate.services.DriverService;
+import com.suraj.cabService.RouteMate.services.RatingService;
+import com.suraj.cabService.RouteMate.services.RideService;
 import com.suraj.cabService.RouteMate.services.RiderService;
 import com.suraj.cabService.RouteMate.strategies.RideStrategyManager;
 import com.suraj.cabService.RouteMate.utils.GeometryUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -32,6 +36,9 @@ public class RiderServiceImpl implements RiderService {
     private final RideStrategyManager rideStrategyManager;
     private final RideRequestRepository rideRequestRepository;
     private final RiderRepository riderRepository;
+    private final RideService rideService;
+    private final DriverService driverService;
+    private final RatingService ratingService;
 
     @Override
     @Transactional
@@ -57,22 +64,51 @@ public class RiderServiceImpl implements RiderService {
 
     @Override
     public RideDto cancelRide(Long rideId) {
-        return null;
+        Rider rider = getCurrentRider();
+        Ride ride = rideService.getRideById(rideId);
+
+        if(!rider.equals(ride.getRider())){
+            throw new RuntimeException("Rider does not own this ride with id: "+ rideId);
+        }
+
+        if(!ride.getRideStatus().equals(RideStatus.CONFIRMED)){
+            throw new RuntimeException("Ride can not be cancelled , shows invalid status: "+ride.getRideStatus());
+        }
+
+        Ride savedRide = rideService.updateRideStatus(ride, RideStatus.CANCELLED);
+        driverService.updateDriverAvailability(ride.getDriver(), true);
+
+        return modelMapper.map(savedRide, RideDto.class);
     }
 
     @Override
     public DriverDto rateDriver(Long rideId, Integer rating) {
-        return null;
+        Ride ride = rideService.getRideById(rideId);
+        Rider rider = getCurrentRider();
+
+        if(!rider.equals(ride.getRider())){
+            throw new RuntimeException("Rider is not the owner of this Ride");
+        }
+
+        if(!ride.getRideStatus().equals(RideStatus.ENDED)){
+            throw new RuntimeException("Ride status is not Ended hence cannot start rating, status: "+ride.getRideStatus());
+        }
+
+        return ratingService.rateDriver(ride,rating);
     }
 
     @Override
     public RiderDto getMyProfile() {
-        return null;
+        Rider currentRider = getCurrentRider();
+        return modelMapper.map(currentRider, RiderDto.class);
     }
 
     @Override
-    public List<RideDto> getAllMyRides() {
-        return List.of();
+    public Page<RideDto> getAllMyRides(PageRequest pageRequest) {
+        Rider currentRider = getCurrentRider();
+        return rideService.getAllRidesOfRider(currentRider, pageRequest).map(
+                ride -> modelMapper.map(ride, RideDto.class)
+        );
     }
 
     @Override

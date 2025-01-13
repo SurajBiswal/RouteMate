@@ -7,5 +7,5 @@ import com.suraj.cabService.RouteMate.dto.UserDto;
 public interface AuthService {
     String login(String email, String password);
     UserDto signup(SignupDto signupDto);
-    DriverDto onboardNewDriver(Long userId);
+    DriverDto onboardNewDriver(Long userId, String vehicleId);
 }
