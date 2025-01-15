@@ -1,12 +1,14 @@
 package com.suraj.cabService.RouteMate.repositories;
 
 import com.suraj.cabService.RouteMate.entities.Driver;
+import com.suraj.cabService.RouteMate.entities.User;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 //ST_Distance(point1, point2)            // distance from current location to destination of rider
 //ST_DWithin(point1, 10000)               // find driver within distance of 10km from rider
@@ -27,6 +29,8 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
             "ORDER BY d.rating DESC "+
             "LIMIT 10" , nativeQuery = true)
     List<Driver> findTenNearbyTopRatedDrivers(Point pickupLocation);
+
+    Optional<Driver>findByUser(User user);
 }
 
 

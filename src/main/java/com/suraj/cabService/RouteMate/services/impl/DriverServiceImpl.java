@@ -3,10 +3,7 @@ package com.suraj.cabService.RouteMate.services.impl;
 import com.suraj.cabService.RouteMate.dto.DriverDto;
 import com.suraj.cabService.RouteMate.dto.RideDto;
 import com.suraj.cabService.RouteMate.dto.RiderDto;
-import com.suraj.cabService.RouteMate.entities.Driver;
-import com.suraj.cabService.RouteMate.entities.Ride;
-import com.suraj.cabService.RouteMate.entities.RideRequest;
-import com.suraj.cabService.RouteMate.entities.Rider;
+import com.suraj.cabService.RouteMate.entities.*;
 import com.suraj.cabService.RouteMate.entities.enums.RideRequestStatus;
 import com.suraj.cabService.RouteMate.entities.enums.RideStatus;
 import com.suraj.cabService.RouteMate.exceptions.ResourceNotFoundException;
@@ -16,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -157,8 +155,9 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public Driver getCurrentDriver() {
-        return driverRepository.findById(2L).orElseThrow(() -> new ResourceNotFoundException("Driver not found with " +
-                "id "+2));
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return driverRepository.findByUser(user).orElseThrow(() -> new ResourceNotFoundException("Driver not found with id " +
+                user.getId()));
     }
 
     @Override
