@@ -64,6 +64,7 @@ public class AuthServiceImpl implements AuthService {
                throw new RuntimeConflictException("Can not signup, user already exist with gmail "+ signupDto.getEmail());
 
         User mappedUser = modelMapper.map(signupDto, User.class);
+//        Role assignedRole = Role.valueOf(signupDto.getRole().toUpperCase());
         mappedUser.setRoles(Set.of(Role.RIDER));
         mappedUser.setPassword(passwordEncoder.encode(mappedUser.getPassword()));
         User savedUser = userRepository.save(mappedUser);
@@ -71,7 +72,6 @@ public class AuthServiceImpl implements AuthService {
 //        Create user related entities
         riderService.createNewRider(savedUser);
 
-        // TODO wallet related service here
         walletService.createNewWallet(savedUser);
 
         return modelMapper.map(savedUser, UserDto.class);
